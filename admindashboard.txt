@@ -1,0 +1,226 @@
+<?php
+// DBconnect.php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "ubermench";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet" />
+<title>Übermensch – Admin Dashboard</title>
+<style>
+body {
+    font-family: 'Fredoka', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+}
+header { background-color: #0d3b66; }
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.nav_logo h1 a { color: #fff; text-decoration: none; font-size: 26px; }
+.nav_link { list-style: none; display: flex; gap: 25px; margin: 0; padding: 0; }
+.nav_link li a { color: #fff; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+.nav_link li a:hover { color: #ffdd00; }
+main { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+h1 { color: #0d3b66; font-weight: 600; margin-bottom: 20px; }
+.stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+.card {
+    flex: 1;
+    min-width: 180px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+.card h2 { font-size: 28px; margin: 0; color: #0d3b66; }
+.card p { margin: 5px 0 0; color: #333; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    margin-bottom: 40px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+th { background-color: #0d3b66; color: #fff; }
+tr:nth-child(even) { background-color: #f2f2f2; }
+</style>
+</head>
+<body>
+<header>
+<nav>
+    <div class="nav_logo">
+        <h1><a href="index.php">Übermensch Admin</a></h1>
+    </div>
+    <ul class="nav_link">
+        <li><a href="show_students.php">Students</a></li>
+        <li><a href="show_providers.php">Aid Providers</a></li>
+        <li><a href="admin_dashboard.php">Dashboard</a></li>
+    </ul>
+</nav>
+</header>
+
+<main>
+<h1>Admin Dashboard</h1>
+
+<?php
+// Fetch summary stats
+$total_students = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS count FROM Student"))['count'];
+$verified_students = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS count FROM Student WHERE verification_status='Verified'"))['count'];
+$total_providers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS count FROM AidProvider"))['count'];
+$total_programs = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS count FROM ScholarshipProgram"))['count'];
+$total_disbursement = mysqli_fetch_assoc(mysqli_query($conn, "SELECT IFNULL(SUM(amount_released),0) AS total FROM Disbursement"))['total'];
+?>
+
+<div class="stats">
+    <div class="card">
+        <h2><?php echo $total_students; ?></h2>
+        <p>Total Students</p>
+    </div>
+    <div class="card">
+        <h2><?php echo $verified_students; ?></h2>
+        <p>Verified Students</p>
+    </div>
+    <div class="card">
+        <h2><?php echo $total_providers; ?></h2>
+        <p>Total Aid Providers</p>
+    </div>
+    <div class="card">
+        <h2><?php echo $total_programs; ?></h2>
+        <p>Total Scholarship Programs</p>
+    </div>
+    <div class="card">
+        <h2><?php echo number_format($total_disbursement, 2); ?></h2>
+        <p>Total Disbursed Funds</p>
+    </div>
+</div>
+
+<h2>Pending Student Verifications</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>DOB</th>
+            <th>District</th>
+            <th>Upazila</th>
+            <th>Verification Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $pending_students = mysqli_query($conn, "SELECT * FROM Student WHERE verification_status='Pending'");
+    if(mysqli_num_rows($pending_students) > 0){
+        while($row = mysqli_fetch_assoc($pending_students)){
+            echo "<tr>";
+            echo "<td>{$row['student_id']}</td>";
+            echo "<td>{$row['name']}</td>";
+            echo "<td>{$row['DOB']}</td>";
+            echo "<td>{$row['district']}</td>";
+            echo "<td>{$row['upazila']}</td>";
+            echo "<td>{$row['verification_status']}</td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='6' style='text-align:center;'>No pending verifications</td></tr>";
+    }
+    ?>
+    </tbody>
+</table>
+
+<h2>Scholarship Programs & Remaining Funds</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Program ID</th>
+            <th>Name</th>
+            <th>Provider ID</th>
+            <th>Total Funds</th>
+            <th>Funds Remaining</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $programs = mysqli_query($conn, "SELECT * FROM ScholarshipProgram");
+    if(mysqli_num_rows($programs) > 0){
+        while($row = mysqli_fetch_assoc($programs)){
+            echo "<tr>";
+            echo "<td>{$row['program_id']}</td>";
+            echo "<td>{$row['program_name']}</td>";
+            echo "<td>{$row['provider_id']}</td>";
+            echo "<td>{$row['total_funds']}</td>";
+            echo "<td>{$row['funds_remaining']}</td>";
+            echo "<td>{$row['start_date']}</td>";
+            echo "<td>{$row['end_date']}</td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='7' style='text-align:center;'>No programs found</td></tr>";
+    }
+    ?>
+    </tbody>
+</table>
+
+<h2>Recent Applications</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Application ID</th>
+            <th>Student ID</th>
+            <th>Program ID</th>
+            <th>Status</th>
+            <th>Application Date</th>
+            <th>Review Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $applications = mysqli_query($conn, "SELECT * FROM Application ORDER BY application_date DESC LIMIT 10");
+    if(mysqli_num_rows($applications) > 0){
+        while($row = mysqli_fetch_assoc($applications)){
+            echo "<tr>";
+            echo "<td>{$row['application_id']}</td>";
+            echo "<td>{$row['student_id']}</td>";
+            echo "<td>{$row['program_id']}</td>";
+            echo "<td>{$row['status']}</td>";
+            echo "<td>{$row['application_date']}</td>";
+            echo "<td>{$row['review_date']}</td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='6' style='text-align:center;'>No applications found</td></tr>";
+    }
+    mysqli_close($conn);
+    ?>
+    </tbody>
+</table>
+
+</main>
+</body>
+</html>

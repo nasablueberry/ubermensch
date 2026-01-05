@@ -1,0 +1,147 @@
+USE ubermench;
+
+-- =========================
+-- REGION
+-- =========================
+INSERT INTO Region (district, upazila) VALUES
+('Dhaka', 'Dhanmondi'),
+('Dhaka', 'Mirpur'),
+('Chattogram', 'Pahartali'),
+('Rajshahi', 'Boalia'),
+('Khulna', 'Sonadanga'),
+('Sylhet', 'Zindabazar'),
+('Barishal', 'Sadar');
+
+-- =========================
+-- INSTITUTION
+-- =========================
+INSERT INTO Institution (name, type, district, upazila) VALUES
+('BRAC University', 'Private University', 'Dhaka', 'Mohakhali'),
+('University of Dhaka', 'Public University', 'Dhaka', 'Shahbag'),
+('University of Chittagong', 'Public University', 'Chattogram', 'Hathazari'),
+('University of Rajshahi', 'Public University', 'Rajshahi', 'Motihar'),
+('Khulna University', 'Public University', 'Khulna', 'Gollamari'),
+('Sylhet Engineering College', 'Engineering College', 'Sylhet', 'Tilagor'),
+('Barishal Polytechnic Institute', 'Polytechnic', 'Barishal', 'Sadar');
+
+-- =========================
+-- STUDENT
+-- =========================
+INSERT INTO Student
+(student_id, birth_certificate_id, name, dob, gender, household_income, cgpa,
+ attendance_percentage, address, district, upazila, verification_status,
+ password, institution_id, region_id)
+VALUES
+('S1001','BC-1999001','Rahim Uddin','2000-05-12','Male',18000,3.65,92.50,'Mirpur-10','Dhaka','Mirpur','verified','pass123',1,2),
+('S1002','BC-1999002','Karima Akter','2001-08-19','Female',15000,3.82,95.00,'Dhanmondi','Dhaka','Dhanmondi','verified','pass123',2,1),
+('S1003','BC-1999003','Mahmud Hasan','1999-11-03','Male',22000,3.20,88.00,'Pahartali','Chattogram','Pahartali','verified','pass123',3,3),
+('S1004','BC-1999004','Nusrat Jahan','2000-02-27','Female',12000,3.90,97.00,'Motihar','Rajshahi','Boalia','verified','pass123',4,4),
+('S1005','BC-1999005','Sabbir Ahmed','2001-06-15','Male',20000,3.10,85.00,'Sonadanga','Khulna','Sonadanga','unverified','pass123',5,5),
+('S1006','BC-1999006','Farzana Islam','2000-09-09','Female',14000,3.75,93.00,'Zindabazar','Sylhet','Zindabazar','verified','pass123',6,6),
+('S1007','BC-1999007','Imran Hossain','1999-12-21','Male',17000,3.45,90.00,'Barishal Sadar','Barishal','Sadar','verified','pass123',7,7);
+
+-- =========================
+-- AID PROVIDER
+-- =========================
+INSERT INTO AidProvider
+(name, password, provider_type, contact_email, contact_phone, address)
+VALUES
+('Ministry of Education Bangladesh','gov123','Government','info@moe.gov.bd','+8802XXXXXXX','Dhaka'),
+('BRAC Foundation','brac123','NGO','aid@brac.net','+880171111111','Dhaka'),
+('Prime Bank Foundation','prime123','Private','foundation@primebank.com','+880181111111','Dhaka'),
+('Grameen Trust','grameen123','NGO','support@grameen.org','+880191111111','Dhaka'),
+('ICT Division Bangladesh','ict123','Government','contact@ictd.gov.bd','+8802YYYYYYY','Dhaka'),
+('Islamic Development Bank','isdb123','International','scholarship@isdb.org','+966XXXXXXXX','Saudi Arabia');
+
+-- =========================
+-- ADMIN
+-- =========================
+INSERT INTO Admin (username, password) VALUES
+('admin1','adminpass'),
+('superadmin','superpass'),
+('system_admin','sys123'),
+('data_admin','data123'),
+('finance_admin','fin123'),
+('review_admin','rev123');
+
+-- =========================
+-- SCHOLARSHIP PROGRAM
+-- =========================
+INSERT INTO ScholarshipProgram
+(program_name, description, eligibility_income_threshold, eligibility_cgpa_threshold,
+ total_funds, funds_remaining, start_date, end_date, provider_id)
+VALUES
+('Merit Cum Need Scholarship','For underprivileged meritorious students',20000,3.50,5000000,3500000,'2025-01-01','2025-12-31',1),
+('BRAC Talent Hunt','Supporting high CGPA students',25000,3.70,3000000,1800000,'2025-02-01','2025-11-30',2),
+('Prime Bank Education Aid','Financial assistance program',22000,3.40,2000000,1200000,'2025-03-01','2025-10-31',3),
+('Grameen Higher Study Grant','Rural student support',18000,3.20,2500000,2000000,'2025-01-15','2025-12-15',4),
+('ICT Innovation Scholarship','Tech focused aid',30000,3.60,4000000,3000000,'2025-04-01','2025-12-31',5),
+('ISDB Scholarship','International funded scholarship',20000,3.80,6000000,4500000,'2025-01-01','2025-12-31',6);
+
+-- =========================
+-- APPLICATION
+-- =========================
+INSERT INTO Application
+(application_date, status, review_date, comments, student_id, program_id)
+VALUES
+(NOW(),'approved',NOW(),'Excellent academic record','S1001',1),
+(NOW(),'approved',NOW(),'Meets all criteria','S1002',2),
+(NOW(),'pending',NULL,NULL,'S1003',3),
+(NOW(),'approved',NOW(),'Outstanding CGPA','S1004',6),
+(NOW(),'rejected',NOW(),'Income exceeds limit','S1005',1),
+(NOW(),'approved',NOW(),'Eligible','S1006',4),
+(NOW(),'pending',NULL,NULL,'S1007',5);
+
+-- =========================
+-- DISBURSEMENT
+-- =========================
+INSERT INTO Disbursement
+(amount_released, payment_method, transaction_reference, application_id)
+VALUES
+(50000,'Bank Transfer','TXN-BD-1001',1),
+(60000,'Mobile Banking','TXN-BD-1002',2),
+(80000,'Bank Transfer','TXN-BD-1003',4),
+(45000,'Mobile Banking','TXN-BD-1004',6),
+(70000,'Bank Transfer','TXN-BD-1005',3),
+(55000,'Mobile Banking','TXN-BD-1006',7);
+
+-- =========================
+-- ELIGIBILITY CHECK
+-- =========================
+INSERT INTO EligibilityCheck
+(income_ok, cgpa_ok, overall_eligible, student_id, program_id)
+VALUES
+(1,1,1,'S1001',1),
+(1,1,1,'S1002',2),
+(1,1,1,'S1003',3),
+(1,1,1,'S1004',6),
+(0,1,0,'S1005',1),
+(1,1,1,'S1006',4),
+(1,1,1,'S1007',5);
+
+-- =========================
+-- DUPLICATE AID LOG
+-- =========================
+INSERT INTO DuplicateAidLog
+(notes, student_id, conflicting_program_id)
+VALUES
+('Student applied to multiple programs','S1001',2),
+('Duplicate application detected','S1002',1),
+('Multiple scholarship overlap','S1004',5),
+('Same academic year conflict','S1006',6),
+('Income-based conflict','S1003',4),
+('CGPA threshold overlap','S1007',3);
+
+-- =========================
+-- REGIONAL AID STATS
+-- =========================
+INSERT INTO RegionalAidStats
+(total_students_supported, total_funds_disbursed, reporting_period, region_id)
+VALUES
+(120,2500000,'2025-Q1',1),
+(95,1800000,'2025-Q1',2),
+(70,1400000,'2025-Q1',3),
+(60,1100000,'2025-Q1',4),
+(85,1600000,'2025-Q1',5),
+(55,900000,'2025-Q1',6),
+(40,750000,'2025-Q1',7);
